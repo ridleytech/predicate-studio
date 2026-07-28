@@ -1,0 +1,15 @@
+{
+  "name": "predicate-developer-studio-contracts",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "deploy": "node --loader ts-node/esm scripts/deploy.ts"
+  },
+  "dependencies": {
+    "ethers": "^6.13.2",
+    "solc": "^0.8.30",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.5.4"
+  }
+}
