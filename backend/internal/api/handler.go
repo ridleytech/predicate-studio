@@ -33,22 +33,21 @@ func (h *Handler) Routes() http.Handler {
 
 	db := h.deps.MongoClient.Database(h.deps.MongoDBName)
 	policiesRepo := repositories.NewMongoPoliciesRepository(db)
-	policiesSvc := services.NewPoliciesService(policiesRepo)
+	auditRepo := repositories.NewMongoAuditLogsRepository(db)
+	policiesSvc := services.NewPoliciesService(policiesRepo, auditRepo)
 	policiesHTTP := &policiesHandler{svc: policiesSvc}
 
 	evalsRepo := repositories.NewMongoEvaluationsRepository(db)
 	evalsSvc := services.NewEvaluationsService(evalsRepo)
 	evalsHTTP := &evaluationsHandler{svc: evalsSvc}
 	evalGetHTTP := &evaluationGetHandler{svc: evalsSvc}
-
-	auditRepo := repositories.NewMongoAuditLogsRepository(db)
 	auditSvc := services.NewAuditLogsService(auditRepo)
 	auditHTTP := &auditLogsHandler{svc: auditSvc}
 
-	evaluateSvc := services.NewEvaluateService(policiesRepo, evalsRepo)
+	evaluateSvc := services.NewEvaluateService(policiesRepo, evalsRepo, auditRepo)
 	evaluateHTTP := &evaluateHandler{svc: evaluateSvc}
 
-	authorizeSvc := services.NewAuthorizeService(policiesRepo, evalsRepo, h.deps.AuthSignerPrivateKey, h.deps.ContractAddress, h.deps.ChainID)
+	authorizeSvc := services.NewAuthorizeService(policiesRepo, evalsRepo, auditRepo, h.deps.AuthSignerPrivateKey, h.deps.ContractAddress, h.deps.ChainID)
 	authorizeHTTP := &authorizeHandler{svc: authorizeSvc}
 
 	mux.HandleFunc("GET /health", h.handleHealth())

@@ -3,6 +3,7 @@ package repositories
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
@@ -43,4 +44,18 @@ func (r *MongoAuditLogsRepository) List(ctx context.Context, limit int64) ([]mod
 	}
 
 	return out, nil
+}
+
+func (r *MongoAuditLogsRepository) Create(ctx context.Context, a models.AuditLog) (models.AuditLog, error) {
+	if a.CreatedAt.IsZero() {
+		a.CreatedAt = time.Now().UTC()
+	}
+	res, err := r.col.InsertOne(ctx, a)
+	if err != nil {
+		return models.AuditLog{}, fmt.Errorf("insert audit log: %w", err)
+	}
+	if id, ok := res.InsertedID.(bson.ObjectID); ok {
+		a.ID = models.ID(id)
+	}
+	return a.WithJSONID(), nil
 }

@@ -17,6 +17,7 @@ import ReactFlow, {
 import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
 import Input from "@/components/ui/Input";
+import Tooltip from "@/components/ui/Tooltip";
 
 import { compilePolicy } from "./compilePolicy";
 import type {
@@ -240,22 +241,89 @@ export default function PolicyFlow({ value, onChange }: Props) {
                 Conditions
               </div>
               <div className="grid grid-cols-1 gap-2">
-                <Button onClick={() => addCondition("wallet_kyc")}>
-                  Wallet KYC
-                </Button>
-                <Button onClick={() => addCondition("country")}>Country</Button>
-                <Button onClick={() => addCondition("risk_score")}>
-                  Risk Score
-                </Button>
-                <Button onClick={() => addCondition("max_amount")}>
-                  Max Amount
-                </Button>
-                <Button onClick={() => addCondition("wallet_allow_list")}>
-                  Wallet Allow List
-                </Button>
-                <Button onClick={() => addCondition("wallet_deny_list")}>
-                  Wallet Deny List
-                </Button>
+                <Tooltip
+                  content="Checks transaction.wallet.kyc. If false, the policy will deny (in an AND chain)."
+                  side="top"
+                >
+                  <span className="w-full">
+                    <Button
+                      onClick={() => addCondition("wallet_kyc")}
+                      className="w-full"
+                    >
+                      Wallet KYC
+                    </Button>
+                  </span>
+                </Tooltip>
+
+                <Tooltip
+                  content="Checks transaction.wallet.country equals the configured country (e.g. US)."
+                  side="top"
+                >
+                  <span className="w-full">
+                    <Button
+                      onClick={() => addCondition("country")}
+                      className="w-full"
+                    >
+                      Country
+                    </Button>
+                  </span>
+                </Tooltip>
+
+                <Tooltip
+                  content="Checks transaction.wallet.riskScore is less than or equal to a max threshold."
+                  side="top"
+                >
+                  <span className="w-full">
+                    <Button
+                      onClick={() => addCondition("risk_score")}
+                      className="w-full"
+                    >
+                      Risk Score
+                    </Button>
+                  </span>
+                </Tooltip>
+
+                <Tooltip
+                  content="Checks transaction.amount is less than or equal to a max value."
+                  side="top"
+                >
+                  <span className="w-full">
+                    <Button
+                      onClick={() => addCondition("max_amount")}
+                      className="w-full"
+                    >
+                      Max Amount
+                    </Button>
+                  </span>
+                </Tooltip>
+
+                <Tooltip
+                  content="Approves only if transaction.wallet.address is in the configured allow-list."
+                  side="top"
+                >
+                  <span className="w-full">
+                    <Button
+                      onClick={() => addCondition("wallet_allow_list")}
+                      className="w-full"
+                    >
+                      Wallet Allow List
+                    </Button>
+                  </span>
+                </Tooltip>
+
+                <Tooltip
+                  content="Denies if transaction.wallet.address is in the configured deny-list."
+                  side="top"
+                >
+                  <span className="w-full">
+                    <Button
+                      onClick={() => addCondition("wallet_deny_list")}
+                      className="w-full"
+                    >
+                      Wallet Deny List
+                    </Button>
+                  </span>
+                </Tooltip>
               </div>
             </div>
 
@@ -264,8 +332,26 @@ export default function PolicyFlow({ value, onChange }: Props) {
                 Logic
               </div>
               <div className="grid grid-cols-2 gap-2">
-                <Button onClick={() => addLogic("and")}>AND</Button>
-                <Button onClick={() => addLogic("or")}>OR</Button>
+                <Tooltip
+                  content="AND means every connected branch must pass for the policy to approve."
+                  side="top"
+                >
+                  <span className="w-full">
+                    <Button onClick={() => addLogic("and")} className="w-full">
+                      AND
+                    </Button>
+                  </span>
+                </Tooltip>
+                <Tooltip
+                  content="OR means any connected branch can approve the policy."
+                  side="top"
+                >
+                  <span className="w-full">
+                    <Button onClick={() => addLogic("or")} className="w-full">
+                      OR
+                    </Button>
+                  </span>
+                </Tooltip>
               </div>
             </div>
 
@@ -274,12 +360,34 @@ export default function PolicyFlow({ value, onChange }: Props) {
                 Result
               </div>
               <div className="grid grid-cols-2 gap-2">
-                <Button onClick={() => addResult("APPROVE")} variant="primary">
-                  Approve
-                </Button>
-                <Button onClick={() => addResult("DENY")} variant="danger">
-                  Deny
-                </Button>
+                <Tooltip
+                  content="Final decision node: approves the transaction if reached."
+                  side="top"
+                >
+                  <span className="w-full">
+                    <Button
+                      onClick={() => addResult("APPROVE")}
+                      variant="primary"
+                      className="w-full"
+                    >
+                      Approve
+                    </Button>
+                  </span>
+                </Tooltip>
+                <Tooltip
+                  content="Final decision node: denies the transaction if reached."
+                  side="top"
+                >
+                  <span className="w-full">
+                    <Button
+                      onClick={() => addResult("DENY")}
+                      variant="danger"
+                      className="w-full"
+                    >
+                      Deny
+                    </Button>
+                  </span>
+                </Tooltip>
               </div>
             </div>
 

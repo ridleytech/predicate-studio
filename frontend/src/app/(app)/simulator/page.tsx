@@ -6,6 +6,7 @@ import { ethers } from "ethers";
 
 import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
+import TooltipUI from "@/components/ui/Tooltip";
 import type { APIError } from "@/services/apiClient";
 import { authorize } from "@/services/authorize";
 import {
@@ -18,6 +19,7 @@ import { evaluatePolicy } from "@/services/simulator";
 import type { Evaluation } from "@/types/evaluation";
 import type { Policy } from "@/types/policy";
 import type { AuthorizeResponse } from "@/types/authorization";
+import { findDemoTemplateByName } from "@/features/demo/demoTemplates";
 
 function safeStringify(v: unknown): string {
   return JSON.stringify(v, null, 2);
@@ -74,6 +76,14 @@ export default function PolicySimulatorPage() {
     () => policies.find((p) => p.id === selectedPolicyId) ?? null,
     [policies, selectedPolicyId],
   );
+
+  const selectedTemplate = useMemo(() => {
+    if (!selectedPolicy) return null;
+    return findDemoTemplateByName(
+      "0x58f84dE7f427459Cc5A8aa7c86FA7650A9834724",
+      selectedPolicy.name,
+    );
+  }, [selectedPolicy]);
 
   const curlExample = useMemo(() => {
     const body = {
@@ -271,29 +281,83 @@ func main() {
             )}
           </Card>
 
+          <Card title="Example Transactions">
+            {!selectedTemplate ? (
+              <div className="text-sm text-slate-400">
+                Select a demo policy to load examples.
+              </div>
+            ) : (
+              <div className="space-y-2">
+                <div className="text-sm text-slate-400">
+                  Load a known-good example to understand the inputs.
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {selectedTemplate.examples.map((ex) => (
+                    <Button
+                      key={ex.label}
+                      variant="secondary"
+                      onClick={() => {
+                        setTxText(safeStringify(ex.tx));
+                        setError(null);
+                        setResult(null);
+                        setAuth(null);
+                        setTxHash(null);
+                      }}
+                    >
+                      {ex.label}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </Card>
+
           <Card title="Actions">
             <div className="flex items-center gap-2">
-              <Button
-                variant="primary"
-                onClick={() => void onRun()}
-                disabled={running || loading || !selectedPolicyId}
+              <TooltipUI
+                content="Sends the transaction JSON to the backend for evaluation. You'll get a decision and a full trace."
+                side="top"
               >
-                {running ? "Running…" : "Run Simulation"}
-              </Button>
-              <Button
-                variant="secondary"
-                onClick={() => void onGenerateAuth()}
-                disabled={!result || result.decision !== "APPROVE"}
+                <span>
+                  <Button
+                    variant="primary"
+                    onClick={() => void onRun()}
+                    disabled={running || loading || !selectedPolicyId}
+                  >
+                    {running ? "Running…" : "Run Simulation"}
+                  </Button>
+                </span>
+              </TooltipUI>
+
+              <TooltipUI
+                content="Requests a backend-signed authorization for an APPROVE evaluation. The contract will verify this signature."
+                side="top"
               >
-                Generate Auth
-              </Button>
-              <Button
-                variant="secondary"
-                onClick={() => void onExecute()}
-                disabled={!auth}
+                <span>
+                  <Button
+                    variant="secondary"
+                    onClick={() => void onGenerateAuth()}
+                    disabled={!result || result.decision !== "APPROVE"}
+                  >
+                    Generate Auth
+                  </Button>
+                </span>
+              </TooltipUI>
+
+              <TooltipUI
+                content="Calls the smart contract using your wallet (MetaMask) and submits the signed authorization on-chain."
+                side="top"
               >
-                Execute On-Chain
-              </Button>
+                <span>
+                  <Button
+                    variant="secondary"
+                    onClick={() => void onExecute()}
+                    disabled={!auth}
+                  >
+                    Execute On-Chain
+                  </Button>
+                </span>
+              </TooltipUI>
             </div>
             <div className="mt-2 text-xs text-slate-500">
               Phase 7: Generate an authorization then execute via MetaMask.
@@ -308,9 +372,14 @@ func main() {
             ) : (
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <div className="text-xs font-medium uppercase tracking-wider text-slate-400">
-                    Decision
-                  </div>
+                  <TooltipUI
+                    content="APPROVE means the policy allowed the transaction. DENY means it was blocked by a rule or validation."
+                    side="top"
+                  >
+                    <span className="text-xs font-medium uppercase tracking-wider text-slate-400">
+                      Decision
+                    </span>
+                  </TooltipUI>
                   <div
                     className={
                       result.decision === "APPROVE"
@@ -321,10 +390,20 @@ func main() {
                     {result.decision}
                   </div>
                 </div>
-                <div className="text-xs text-slate-500">{result.reason}</div>
-                <div className="text-xs text-slate-500">
-                  Latency: {result.latencyMs} ms
-                </div>
+                <TooltipUI
+                  content="A short human-readable explanation of the final decision."
+                  side="top"
+                >
+                  <div className="text-xs text-slate-500">{result.reason}</div>
+                </TooltipUI>
+                <TooltipUI
+                  content="Time spent in the backend evaluation engine. Useful for performance tracking."
+                  side="top"
+                >
+                  <div className="text-xs text-slate-500">
+                    Latency: {result.latencyMs} ms
+                  </div>
+                </TooltipUI>
               </div>
             )}
           </Card>

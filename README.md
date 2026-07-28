@@ -1,18 +1,53 @@
 # Predicate Developer Studio
 
-Production-quality proof of concept for a policy-driven blockchain transaction developer platform.
+Production-quality proof of concept for a **policy-driven blockchain transaction developer platform**.
+
+This repo is tailored to Predicate’s developer platform goals: **Go backend services**, a **polished Next.js dashboard**, and a **smart-contract-layer enforcement story** that is approachable to developers and auditable for risk/compliance.
+
+## What this PoC demonstrates
+
+- **Developer workflow** to author, test, and ship transaction policies
+- **Explainability** via decision reasons and full execution traces
+- **Cryptographic enforcement** by verifying a backend signer’s authorization inside a Solidity contract
+- **Operational tooling**: dashboard metrics + audit/replay views to understand “what happened and why”
+
+## Executive-relevant use cases
+
+- **Regulated on-chain transaction gating**
+  - KYC checks, country restrictions, deny/allow lists, risk thresholds, max transfer limits.
+- **Offchain checks with onchain guarantees**
+  - Backend signs an authorization only after checks pass; contract verifies signature, expiry, and replay protection.
+- **Auditability and incident response**
+  - Historical evaluation records can be replayed with traces and policy snapshots.
+- **Developer platform ergonomics**
+  - Visual builder templates + simulator examples reduce time-to-first-success for new developers.
 
 ## Repository layout
-
-- `frontend/` Next.js (App Router) static dashboard UI
-- `backend/` Go 1.24+ REST API (standard `net/http`)
-- `contracts/` Solidity smart contract(s)
-
-This `web/` folder is the canonical project root.
 
 - `web/frontend/` Next.js (App Router) static dashboard UI
 - `web/backend/` Go 1.24+ REST API (standard `net/http`)
 - `web/contracts/` Solidity contract + deploy script
+
+## Product walkthrough (screens)
+
+- **Dashboard**
+  - Recent evaluation volume, approval rate, denials, latency.
+- **Policy Builder**
+  - Template gallery + visual policy graph (React Flow), validation, compiled output, tooltips.
+- **Policy Simulator**
+  - Example transaction buttons, evaluation trace viewer, authorization generation, on-chain execution via MetaMask.
+- **Audit Explorer**
+  - Browse stored evaluations, view policy snapshot, replay traces on the stored policy graph.
+
+## Screenshots
+
+| Dashboard                                                       | Policy Builder                                                                    |
+| --------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| <img src="assets/dashboard.png" width="450" alt="Dashboard" />  | <img src="assets/policy-builder.png" width="450" alt="Policy Builder" />          |
+| Simulator                                                       | Simulator (Result)                                                                |
+| <img src="assets/simulator.png" width="450" alt="Simulator" />  | <img src="assets/simulator-result.png" width="450" alt="Simulator with result" /> |
+| Audit Explorer                                                  | Settings                                                                          |
+| <img src="assets/audit.png" width="450" alt="Audit Explorer" /> | <img src="assets/settings.png" width="450" alt="Settings" />                      |
 
 ## Frontend (Next.js)
 
@@ -156,7 +191,8 @@ Authorization / chain:
 ```bash
 cd web/contracts
 npm install
-export GANACHE_RPC_URL=http://127.0.0.1:8545
+# Ganache UI commonly uses 7545. Adjust if yours is different.
+export GANACHE_RPC_URL=http://127.0.0.1:7545
 export DEPLOYER_PRIVATE_KEY='<ganache-private-key>'
 export AUTH_SIGNER_ADDRESS='<backend-auth-signer-address>'
 npm run deploy
@@ -180,3 +216,20 @@ cd web/frontend
 export NEXT_PUBLIC_API_BASE_URL=http://127.0.0.1:8081
 npm run dev
 ```
+
+4. Seed demo data (recommended for screenshots):
+
+From `web/`:
+
+```bash
+node scripts/seed-demo.mjs
+```
+
+This creates example policies, evaluations, and an authorization so every screen is populated.
+
+5. MetaMask network (for "Execute On-Chain"):
+
+On-chain execution uses an injected wallet (`window.ethereum`), so MetaMask must be connected to your local chain.
+
+- RPC URL: `http://127.0.0.1:7545`
+- Chain ID: `1337` (or whatever Ganache shows)

@@ -16,13 +16,14 @@ import (
 type AuthorizeService struct {
 	policiesRepo repositories.PoliciesRepository
 	evalsRepo    repositories.EvaluationsRepository
+	auditRepo    repositories.AuditLogsRepository
 	signerKey    string
 	contractAddr string
 	chainID      int64
 }
 
-func NewAuthorizeService(policies repositories.PoliciesRepository, evals repositories.EvaluationsRepository, signerKey string, contractAddr string, chainID int64) *AuthorizeService {
-	return &AuthorizeService{policiesRepo: policies, evalsRepo: evals, signerKey: signerKey, contractAddr: contractAddr, chainID: chainID}
+func NewAuthorizeService(policies repositories.PoliciesRepository, evals repositories.EvaluationsRepository, audit repositories.AuditLogsRepository, signerKey string, contractAddr string, chainID int64) *AuthorizeService {
+	return &AuthorizeService{policiesRepo: policies, evalsRepo: evals, auditRepo: audit, signerKey: signerKey, contractAddr: contractAddr, chainID: chainID}
 }
 
 type AuthorizeInput struct {
@@ -103,6 +104,9 @@ func (s *AuthorizeService) Authorize(ctx context.Context, in AuthorizeInput) (Au
 		EvaluationIDHash: "0x" + common.Bytes2Hex(evalIDHash[:]),
 		ContractAddress:  contract.Hex(),
 		ChainID:          s.chainID,
+	}
+	if s.auditRepo != nil {
+		_, _ = s.auditRepo.Create(ctx, models.AuditLog{Actor: "system", Action: "authorization.create", CreatedAt: time.Now().UTC()})
 	}
 
 	return AuthorizeOutput{Authorization: auth, Signature: sig}, nil

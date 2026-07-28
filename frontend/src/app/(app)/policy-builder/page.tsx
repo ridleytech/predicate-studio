@@ -17,6 +17,8 @@ import PolicyFlow, {
 } from "@/features/policy-builder/PolicyFlow";
 import type { PersistedPolicy } from "@/features/policy-builder/types";
 import { validatePolicyGraph } from "@/features/policy-builder/validatePolicyGraph";
+import { getDemoTemplates } from "@/features/demo/demoTemplates";
+import Tooltip from "@/components/ui/Tooltip";
 
 function isPersistedPolicy(v: unknown): v is PersistedPolicy {
   if (!v || typeof v !== "object") return false;
@@ -33,6 +35,11 @@ export default function PolicyBuilderPage() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const templates = useMemo(
+    () => getDemoTemplates("0x58f84dE7f427459Cc5A8aa7c86FA7650A9834724"),
+    [],
+  );
 
   const selected = useMemo(
     () => policies.find((p) => p.id === selectedId) ?? null,
@@ -82,6 +89,23 @@ export default function PolicyBuilderPage() {
       const p = await createPolicy({
         name: "New Policy",
         policy: createDefaultPersistedPolicy() as any,
+      });
+      setPolicies((prev) => [p, ...prev]);
+      setSelectedId(p.id);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "Create failed";
+      setError(msg);
+    }
+  }
+
+  async function onCreateFromTemplate(templateName: string) {
+    const t = templates.find((x) => x.name === templateName);
+    if (!t) return;
+    setError(null);
+    try {
+      const p = await createPolicy({
+        name: t.name,
+        policy: t.policy as any,
       });
       setPolicies((prev) => [p, ...prev]);
       setSelectedId(p.id);
@@ -171,6 +195,29 @@ export default function PolicyBuilderPage() {
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-12">
         <div className="md:col-span-4">
+          <Card title="Template Gallery">
+            <div className="space-y-2">
+              <div className="text-sm text-slate-400">
+                Start from a real example policy (recommended for demos).
+              </div>
+              <div className="grid grid-cols-1 gap-2">
+                {templates.map((t) => (
+                  <Tooltip key={t.name} content={t.description} side="top">
+                    <span className="w-full">
+                      <Button
+                        variant="secondary"
+                        onClick={() => void onCreateFromTemplate(t.name)}
+                        className="w-full"
+                      >
+                        {t.name}
+                      </Button>
+                    </span>
+                  </Tooltip>
+                ))}
+              </div>
+            </div>
+          </Card>
+
           <Card title="Policies">
             {loading ? (
               <div className="text-sm text-slate-400">Loading…</div>

@@ -3,17 +3,19 @@ package services
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"predicate-developer-studio-backend/internal/models"
 	"predicate-developer-studio-backend/internal/repositories"
 )
 
 type PoliciesService struct {
-	repo repositories.PoliciesRepository
+	repo  repositories.PoliciesRepository
+	audit repositories.AuditLogsRepository
 }
 
-func NewPoliciesService(repo repositories.PoliciesRepository) *PoliciesService {
-	return &PoliciesService{repo: repo}
+func NewPoliciesService(repo repositories.PoliciesRepository, audit repositories.AuditLogsRepository) *PoliciesService {
+	return &PoliciesService{repo: repo, audit: audit}
 }
 
 func (s *PoliciesService) Create(ctx context.Context, name string, policy map[string]any) (models.Policy, error) {
@@ -24,7 +26,14 @@ func (s *PoliciesService) Create(ctx context.Context, name string, policy map[st
 		return models.Policy{}, fmt.Errorf("policy is required")
 	}
 
-	return s.repo.Create(ctx, models.Policy{Name: name, Policy: policy})
+	created, err := s.repo.Create(ctx, models.Policy{Name: name, Policy: policy})
+	if err != nil {
+		return models.Policy{}, err
+	}
+	if s.audit != nil {
+		_, _ = s.audit.Create(ctx, models.AuditLog{Actor: "system", Action: "policy.create", CreatedAt: time.Now().UTC()})
+	}
+	return created, nil
 }
 
 func (s *PoliciesService) List(ctx context.Context, limit int64) ([]models.Policy, error) {
@@ -39,9 +48,23 @@ func (s *PoliciesService) Update(ctx context.Context, id models.ID, name *string
 	if name == nil && policy == nil {
 		return models.Policy{}, fmt.Errorf("no fields to update")
 	}
-	return s.repo.Update(ctx, id, repositories.PolicyUpdate{Name: name, Policy: policy})
+	updated, err := s.repo.Update(ctx, id, repositories.PolicyUpdate{Name: name, Policy: policy})
+	if err != nil {
+		return models.Policy{}, err
+	}
+	if s.audit != nil {
+		_, _ = s.audit.Create(ctx, models.AuditLog{Actor: "system", Action: "policy.update", CreatedAt: time.Now().UTC()})
+	}
+	return updated, nil
 }
 
 func (s *PoliciesService) Delete(ctx context.Context, id models.ID) error {
-	return s.repo.Delete(ctx, id)
+	err := s.repo.Delete(ctx, id)
+	if err != nil {
+		return err
+	}
+	if s.audit != nil {
+		_, _ = s.audit.Create(ctx, models.AuditLog{Actor: "system", Action: "policy.delete", CreatedAt: time.Now().UTC()})
+	}
+	return nil
 }

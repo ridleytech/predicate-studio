@@ -14,10 +14,11 @@ import (
 type EvaluateService struct {
 	policies repositories.PoliciesRepository
 	evals    repositories.EvaluationsRepository
+	audit    repositories.AuditLogsRepository
 }
 
-func NewEvaluateService(policies repositories.PoliciesRepository, evals repositories.EvaluationsRepository) *EvaluateService {
-	return &EvaluateService{policies: policies, evals: evals}
+func NewEvaluateService(policies repositories.PoliciesRepository, evals repositories.EvaluationsRepository, audit repositories.AuditLogsRepository) *EvaluateService {
+	return &EvaluateService{policies: policies, evals: evals, audit: audit}
 }
 
 type EvaluateInput struct {
@@ -74,6 +75,9 @@ func (s *EvaluateService) Evaluate(ctx context.Context, in EvaluateInput) (Evalu
 	created, err := s.evals.Create(ctx, e)
 	if err != nil {
 		return EvaluateOutput{}, err
+	}
+	if s.audit != nil {
+		_, _ = s.audit.Create(ctx, models.AuditLog{Actor: "system", Action: "evaluation.create", CreatedAt: time.Now().UTC()})
 	}
 
 	return EvaluateOutput{Evaluation: created}, nil

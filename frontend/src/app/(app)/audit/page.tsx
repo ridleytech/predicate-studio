@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
+import TooltipUI from "@/components/ui/Tooltip";
 import { getEvaluation, listEvaluations } from "@/services/evaluations";
 import type { Evaluation } from "@/types/evaluation";
 import TraceReplayFlow from "@/features/trace/TraceReplayFlow";
@@ -101,7 +102,12 @@ export default function AuditExplorerPage() {
             window.location.reload();
           }}
         >
-          Refresh
+          <TooltipUI
+            content="Reloads evaluation history from the backend."
+            side="top"
+          >
+            <span>Refresh</span>
+          </TooltipUI>
         </Button>
       </div>
 
@@ -123,10 +129,38 @@ export default function AuditExplorerPage() {
                 <table className="w-full text-sm">
                   <thead className="text-left text-xs text-slate-400">
                     <tr>
-                      <th className="py-2">Policy</th>
-                      <th className="py-2">Decision</th>
-                      <th className="py-2">Latency</th>
-                      <th className="py-2">Time</th>
+                      <th className="py-2">
+                        <TooltipUI
+                          content="The policy name that was evaluated."
+                          side="top"
+                        >
+                          <span>Policy</span>
+                        </TooltipUI>
+                      </th>
+                      <th className="py-2">
+                        <TooltipUI
+                          content="The final decision for this evaluation."
+                          side="top"
+                        >
+                          <span>Decision</span>
+                        </TooltipUI>
+                      </th>
+                      <th className="py-2">
+                        <TooltipUI
+                          content="Backend time spent evaluating the policy."
+                          side="top"
+                        >
+                          <span>Latency</span>
+                        </TooltipUI>
+                      </th>
+                      <th className="py-2">
+                        <TooltipUI
+                          content="When the evaluation was created."
+                          side="top"
+                        >
+                          <span>Time</span>
+                        </TooltipUI>
+                      </th>
                     </tr>
                   </thead>
                   <tbody className="text-slate-200">
@@ -185,15 +219,30 @@ export default function AuditExplorerPage() {
                 <div className="text-sm text-slate-100">
                   {selected.policyName}
                 </div>
-                <div className="text-xs text-slate-500">
-                  Evaluation: {selected.id}
-                </div>
-                <div className="text-xs text-slate-500">
-                  Policy version: v{selected.policyVersion}
-                </div>
-                <div className="text-xs text-slate-500">
-                  Reason: {selected.reason}
-                </div>
+                <TooltipUI
+                  content="Unique ID of the evaluation record."
+                  side="top"
+                >
+                  <div className="text-xs text-slate-500">
+                    Evaluation: {selected.id}
+                  </div>
+                </TooltipUI>
+                <TooltipUI
+                  content="Version number of the policy at the time of evaluation."
+                  side="top"
+                >
+                  <div className="text-xs text-slate-500">
+                    Policy version: v{selected.policyVersion}
+                  </div>
+                </TooltipUI>
+                <TooltipUI
+                  content="Human-readable explanation of the decision."
+                  side="top"
+                >
+                  <div className="text-xs text-slate-500">
+                    Reason: {selected.reason}
+                  </div>
+                </TooltipUI>
               </div>
             )}
           </Card>
@@ -205,7 +254,12 @@ export default function AuditExplorerPage() {
               <div>
                 <div>
                   <div className="mb-2 text-xs font-medium uppercase tracking-wider text-slate-400">
-                    Snapshot
+                    <TooltipUI
+                      content="The compiled policy logic captured at evaluation time. Useful for replay and debugging."
+                      side="top"
+                    >
+                      <span>Snapshot</span>
+                    </TooltipUI>
                   </div>
                   <pre className="overflow-auto rounded-md border border-slate-800 bg-slate-950 p-3 text-xs text-slate-200">
                     {JSON.stringify(snapshot?.compiled ?? null, null, 2)}
@@ -223,10 +277,23 @@ export default function AuditExplorerPage() {
                 Missing `policySnapshot.graph` or `trace`.
               </div>
             ) : (
-              <TraceReplayFlow
-                graph={snapshot!.graph!}
-                trace={selected.trace}
-              />
+              <div>
+                <div className="mb-2 text-xs text-slate-400">
+                  <TooltipUI
+                    content="Animates the policy graph while stepping through the evaluation trace events."
+                    side="top"
+                  >
+                    <span>
+                      Hover nodes to understand the path taken during
+                      evaluation.
+                    </span>
+                  </TooltipUI>
+                </div>
+                <TraceReplayFlow
+                  graph={snapshot!.graph!}
+                  trace={selected.trace}
+                />
+              </div>
             )}
           </Card>
         </div>
