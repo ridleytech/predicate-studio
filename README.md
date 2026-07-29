@@ -41,13 +41,17 @@ This repo is tailored to Predicate’s developer platform goals: **Go backend se
 
 ## Screenshots
 
-| Dashboard                                                       | Policy Builder                                                                    |
-| --------------------------------------------------------------- | --------------------------------------------------------------------------------- |
-| <img src="assets/dashboard.png" width="450" alt="Dashboard" />  | <img src="assets/policy-builder.png" width="450" alt="Policy Builder" />          |
-| Simulator                                                       | Simulator (Result)                                                                |
-| <img src="assets/simulator.png" width="450" alt="Simulator" />  | <img src="assets/simulator-result.png" width="450" alt="Simulator with result" /> |
-| Audit Explorer                                                  | Settings                                                                          |
-| <img src="assets/audit.png" width="450" alt="Audit Explorer" /> | <img src="assets/settings.png" width="450" alt="Settings" />                      |
+| Dashboard                                                                  | Policy Builder                                                                    |
+| -------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| <img src="assets/dashboard.png" width="520" alt="Dashboard" />             | <img src="assets/policy-builder.png" width="520" alt="Policy Builder" />          |
+| Simulator                                                                  | Simulator (Result)                                                                |
+| <img src="assets/simulator.png" width="520" alt="Simulator" />             | <img src="assets/simulator-result.png" width="520" alt="Simulator with result" /> |
+| Simulator (Trace)                                                          | Simulator (SDK)                                                                   |
+| <img src="assets/simulator-trace.png" width="520" alt="Simulator trace" /> | <img src="assets/simulator-sdk.png" width="520" alt="Simulator SDK" />            |
+| Audit Explorer                                                             | Audit (Replay)                                                                    |
+| <img src="assets/audit.png" width="520" alt="Audit Explorer" />            | <img src="assets/audit-replay.png" width="520" alt="Audit replay" />              |
+| Settings                                                                   |                                                                                   |
+| <img src="assets/settings.png" width="520" alt="Settings" />               |                                                                                   |
 
 ## Frontend (Next.js)
 

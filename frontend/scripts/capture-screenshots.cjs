@@ -112,6 +112,32 @@ async function main() {
       path: path.join(outDir, "simulator-result.png"),
       fullPage: true,
     });
+
+    // Capture the Trace tab view as well (the simulator UI is now tabbed).
+    try {
+      await page
+        .getByRole("button", { name: "Trace" })
+        .click({ timeout: 1500 });
+      await sleep(300);
+      await page.screenshot({
+        path: path.join(outDir, "simulator-trace.png"),
+        fullPage: true,
+      });
+    } catch {
+      // ignore
+    }
+
+    // Capture the SDK tab view (API examples).
+    try {
+      await page.getByRole("button", { name: "SDK" }).click({ timeout: 1500 });
+      await sleep(300);
+      await page.screenshot({
+        path: path.join(outDir, "simulator-sdk.png"),
+        fullPage: true,
+      });
+    } catch {
+      // ignore
+    }
   } catch (e) {
     console.warn(
       "Could not capture simulator-result.png (non-fatal):",
@@ -120,6 +146,21 @@ async function main() {
   }
 
   await snap("audit.png", "/audit");
+
+  // Audit Explorer is now tabbed; capture the Replay tab if available.
+  try {
+    await page.goto(`${baseUrl}/audit`, { waitUntil: "networkidle" });
+    await ensureOnboardingClosed();
+    await page.getByRole("button", { name: "Replay" }).click({ timeout: 1500 });
+    await sleep(500);
+    await page.screenshot({
+      path: path.join(outDir, "audit-replay.png"),
+      fullPage: true,
+    });
+  } catch {
+    // ignore
+  }
+
   await snap("settings.png", "/settings");
 
   await browser.close();
