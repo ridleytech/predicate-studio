@@ -53,7 +53,7 @@ This repo is tailored to Predicate’s developer platform goals: **Go backend se
 | Settings                                                                   |                                                                                   |
 | <img src="assets/settings.png" width="520" alt="Settings" />               |                                                                                   |
 
-## Frontend (Next.js)
+## Frontend (React/Next.js)
 
 ### Requirements
 
