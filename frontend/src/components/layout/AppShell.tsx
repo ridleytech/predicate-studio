@@ -54,23 +54,21 @@ export default function AppShell({ children }: Props) {
             {navItems.map((item) => {
               const active = pathname === item.href;
               return (
-                <TooltipUI
-                  key={item.href}
-                  content={navHelp[item.href] ?? ""}
-                  side="top"
-                >
-                  <Link
-                    href={item.href}
-                    className={[
-                      "block rounded-md px-3 py-2 text-sm",
-                      active
-                        ? "bg-slate-800 text-slate-50"
-                        : "text-slate-300 hover:bg-slate-900 hover:text-slate-50",
-                    ].join(" ")}
-                  >
-                    {item.label}
-                  </Link>
-                </TooltipUI>
+                <div key={item.href} className="block">
+                  <TooltipUI content={navHelp[item.href] ?? ""} side="top">
+                    <Link
+                      href={item.href}
+                      className={[
+                        "block rounded-md px-3 py-2 text-sm",
+                        active
+                          ? "bg-slate-800 text-slate-50"
+                          : "text-slate-300 hover:bg-slate-900 hover:text-slate-50",
+                      ].join(" ")}
+                    >
+                      {item.label}
+                    </Link>
+                  </TooltipUI>
+                </div>
               );
             })}
           </nav>

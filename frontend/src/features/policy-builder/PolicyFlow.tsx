@@ -235,12 +235,12 @@ export default function PolicyFlow({ value, onChange }: Props) {
     <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
       <div className="space-y-4 lg:col-span-3">
         <Card title="Palette">
-          <div className="space-y-3">
+          <div className="space-y-4">
             <div>
               <div className="mb-2 text-xs font-medium uppercase tracking-wider text-slate-400">
                 Conditions
               </div>
-              <div className="grid grid-cols-1 gap-2">
+              <div className="grid grid-cols-1 gap-3">
                 <Tooltip
                   content="Checks transaction.wallet.kyc. If false, the policy will deny (in an AND chain)."
                   side="top"
@@ -248,7 +248,7 @@ export default function PolicyFlow({ value, onChange }: Props) {
                   <span className="w-full">
                     <Button
                       onClick={() => addCondition("wallet_kyc")}
-                      className="w-full"
+                      className="h-10 w-full"
                     >
                       Wallet KYC
                     </Button>
@@ -262,7 +262,7 @@ export default function PolicyFlow({ value, onChange }: Props) {
                   <span className="w-full">
                     <Button
                       onClick={() => addCondition("country")}
-                      className="w-full"
+                      className="h-10 w-full"
                     >
                       Country
                     </Button>
@@ -276,7 +276,7 @@ export default function PolicyFlow({ value, onChange }: Props) {
                   <span className="w-full">
                     <Button
                       onClick={() => addCondition("risk_score")}
-                      className="w-full"
+                      className="h-10 w-full"
                     >
                       Risk Score
                     </Button>
@@ -290,7 +290,7 @@ export default function PolicyFlow({ value, onChange }: Props) {
                   <span className="w-full">
                     <Button
                       onClick={() => addCondition("max_amount")}
-                      className="w-full"
+                      className="h-10 w-full"
                     >
                       Max Amount
                     </Button>
@@ -304,7 +304,7 @@ export default function PolicyFlow({ value, onChange }: Props) {
                   <span className="w-full">
                     <Button
                       onClick={() => addCondition("wallet_allow_list")}
-                      className="w-full"
+                      className="h-10 w-full"
                     >
                       Wallet Allow List
                     </Button>
@@ -318,7 +318,7 @@ export default function PolicyFlow({ value, onChange }: Props) {
                   <span className="w-full">
                     <Button
                       onClick={() => addCondition("wallet_deny_list")}
-                      className="w-full"
+                      className="h-10 w-full"
                     >
                       Wallet Deny List
                     </Button>
@@ -331,13 +331,16 @@ export default function PolicyFlow({ value, onChange }: Props) {
               <div className="mb-2 text-xs font-medium uppercase tracking-wider text-slate-400">
                 Logic
               </div>
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-2 gap-3">
                 <Tooltip
                   content="AND means every connected branch must pass for the policy to approve."
                   side="top"
                 >
                   <span className="w-full">
-                    <Button onClick={() => addLogic("and")} className="w-full">
+                    <Button
+                      onClick={() => addLogic("and")}
+                      className="h-10 w-full"
+                    >
                       AND
                     </Button>
                   </span>
@@ -347,7 +350,10 @@ export default function PolicyFlow({ value, onChange }: Props) {
                   side="top"
                 >
                   <span className="w-full">
-                    <Button onClick={() => addLogic("or")} className="w-full">
+                    <Button
+                      onClick={() => addLogic("or")}
+                      className="h-10 w-full"
+                    >
                       OR
                     </Button>
                   </span>
@@ -359,7 +365,7 @@ export default function PolicyFlow({ value, onChange }: Props) {
               <div className="mb-2 text-xs font-medium uppercase tracking-wider text-slate-400">
                 Result
               </div>
-              <div className="grid grid-cols-2 gap-2">
+              <div className="flex flex-col gap-3">
                 <Tooltip
                   content="Final decision node: approves the transaction if reached."
                   side="top"
@@ -368,7 +374,7 @@ export default function PolicyFlow({ value, onChange }: Props) {
                     <Button
                       onClick={() => addResult("APPROVE")}
                       variant="primary"
-                      className="w-full"
+                      className="h-10 w-full px-4"
                     >
                       Approve
                     </Button>
@@ -382,7 +388,7 @@ export default function PolicyFlow({ value, onChange }: Props) {
                     <Button
                       onClick={() => addResult("DENY")}
                       variant="danger"
-                      className="w-full"
+                      className="h-10 w-full px-4"
                     >
                       Deny
                     </Button>
@@ -391,33 +397,37 @@ export default function PolicyFlow({ value, onChange }: Props) {
               </div>
             </div>
 
-            <div className="flex items-center gap-2">
-              <Button onClick={duplicateSelected} disabled={!selectedNode}>
+            <div className="flex flex-col gap-2">
+              <Button
+                onClick={duplicateSelected}
+                disabled={!selectedNode}
+                className="h-10 w-full"
+              >
                 Duplicate
               </Button>
               <Button
                 onClick={deleteSelected}
                 disabled={!selectedNode}
                 variant="danger"
+                className="h-10 w-full"
               >
                 Delete
               </Button>
             </div>
 
-            <div className="flex items-center gap-2">
-              <Button
-                onClick={() => {
-                  if (!persisted) return;
-                  navigator.clipboard.writeText(
-                    JSON.stringify(persisted, null, 2),
-                  );
-                }}
-                disabled={!persisted}
-                variant="secondary"
-              >
-                Copy JSON
-              </Button>
-            </div>
+            <Button
+              onClick={() => {
+                if (!persisted) return;
+                navigator.clipboard.writeText(
+                  JSON.stringify(persisted, null, 2),
+                );
+              }}
+              disabled={!persisted}
+              variant="secondary"
+              className="h-10 w-full"
+            >
+              Copy JSON
+            </Button>
           </div>
         </Card>
 

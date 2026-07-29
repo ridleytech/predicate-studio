@@ -194,7 +194,7 @@ export default function PolicyBuilderPage() {
       ) : null}
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-12">
-        <div className="md:col-span-4">
+        <div className="space-y-4 md:col-span-4 md:max-h-[calc(100vh-260px)] md:overflow-auto">
           <Card title="Template Gallery">
             <div className="space-y-2">
               <div className="text-sm text-slate-400">
@@ -224,32 +224,34 @@ export default function PolicyBuilderPage() {
             ) : policies.length === 0 ? (
               <div className="text-sm text-slate-400">No policies yet.</div>
             ) : (
-              <div className="space-y-1">
-                {policies.map((p) => {
-                  const active = p.id === selectedId;
-                  return (
-                    <button
-                      key={p.id}
-                      onClick={() => setSelectedId(p.id)}
-                      className={[
-                        "w-full rounded-md px-3 py-2 text-left text-sm",
-                        active
-                          ? "bg-slate-800 text-slate-50"
-                          : "text-slate-300 hover:bg-slate-900",
-                      ].join(" ")}
-                    >
-                      <div className="flex items-center justify-between gap-2">
-                        <div className="truncate font-medium">{p.name}</div>
-                        <div className="shrink-0 text-xs text-slate-500">
-                          v{p.version}
+              <div className="max-h-[360px] overflow-auto">
+                <div className="space-y-1">
+                  {policies.map((p) => {
+                    const active = p.id === selectedId;
+                    return (
+                      <button
+                        key={p.id}
+                        onClick={() => setSelectedId(p.id)}
+                        className={[
+                          "w-full rounded-md px-3 py-2 text-left text-sm",
+                          active
+                            ? "bg-slate-800 text-slate-50"
+                            : "text-slate-300 hover:bg-slate-900",
+                        ].join(" ")}
+                      >
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="truncate font-medium">{p.name}</div>
+                          <div className="shrink-0 text-xs text-slate-500">
+                            v{p.version}
+                          </div>
                         </div>
-                      </div>
-                      <div className="mt-1 truncate text-xs text-slate-500">
-                        {p.id}
-                      </div>
-                    </button>
-                  );
-                })}
+                        <div className="mt-1 truncate text-xs text-slate-500">
+                          {p.id}
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
             )}
           </Card>
@@ -273,10 +275,18 @@ export default function PolicyBuilderPage() {
                   </div>
 
                   <div className="flex items-center justify-end gap-2">
-                    <Button variant="danger" onClick={() => void onDelete()}>
+                    <Button
+                      variant="danger"
+                      onClick={() => void onDelete()}
+                      className="w-full sm:w-auto"
+                    >
                       Delete
                     </Button>
-                    <Button variant="primary" onClick={() => void onSave()}>
+                    <Button
+                      variant="primary"
+                      onClick={() => void onSave()}
+                      className="w-full sm:w-auto"
+                    >
                       Save
                     </Button>
                   </div>
@@ -286,7 +296,7 @@ export default function PolicyBuilderPage() {
           </div>
         </div>
 
-        <div className="md:col-span-8">
+        <div className="md:col-span-8 md:max-h-[calc(100vh-260px)] md:overflow-auto">
           <Card title="Visual Builder">
             {!selected ? (
               <div className="text-sm text-slate-400">

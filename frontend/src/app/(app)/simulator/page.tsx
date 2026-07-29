@@ -46,6 +46,10 @@ export default function PolicySimulatorPage() {
   const [auth, setAuth] = useState<AuthorizeResponse | null>(null);
   const [txHash, setTxHash] = useState<string | null>(null);
 
+  const [rightTab, setRightTab] = useState<"transaction" | "trace" | "sdk">(
+    "transaction",
+  );
+
   useEffect(() => {
     let cancelled = false;
     async function load() {
@@ -249,7 +253,7 @@ func main() {
       ) : null}
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
-        <div className="space-y-4 lg:col-span-4">
+        <div className="space-y-4 lg:col-span-4 lg:max-h-[calc(100vh-260px)] lg:overflow-auto">
           <Card title="Policy">
             {loading ? (
               <div className="text-sm text-slate-400">Loading…</div>
@@ -433,65 +437,126 @@ func main() {
           </Card>
         </div>
 
-        <div className="space-y-4 lg:col-span-8">
-          <Card title="Transaction JSON">
-            <div className="h-[420px] overflow-hidden rounded-lg border border-slate-800">
-              <Editor
-                height="420px"
-                defaultLanguage="json"
-                theme="vs-dark"
-                value={txText}
-                onChange={(v) => setTxText(v ?? "")}
-                options={{
-                  minimap: { enabled: false },
-                  fontSize: 12,
-                  scrollBeyondLastLine: false,
-                }}
-              />
-            </div>
-          </Card>
-
-          <Card title="Execution Trace">
-            {!result ? (
-              <div className="text-sm text-slate-400">—</div>
-            ) : result.trace.length === 0 ? (
-              <div className="text-sm text-slate-400">No trace events.</div>
-            ) : (
-              <div className="space-y-2">
-                {result.trace.map((t, idx) => (
-                  <div
-                    key={idx}
-                    className="flex items-start justify-between gap-3 rounded-md border border-slate-800 bg-slate-950/40 px-3 py-2"
-                  >
-                    <div className="min-w-0">
-                      <div className="text-sm text-slate-100">
-                        {t.type}
-                        {t.key ? `: ${t.key}` : ""}
-                      </div>
-                      <div className="mt-0.5 text-xs text-slate-400">
-                        {t.message}
-                      </div>
-                    </div>
-                    <div
-                      className={
-                        t.outcome === "PASS"
-                          ? "text-xs text-emerald-300"
-                          : "text-xs text-red-300"
-                      }
-                    >
-                      {t.outcome}
-                    </div>
-                  </div>
-                ))}
+        <div className="lg:col-span-8">
+          <Card>
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <div className="text-sm font-semibold text-slate-100">
+                Inspector
               </div>
-            )}
-          </Card>
+              <div className="flex items-center gap-1 rounded-lg border border-slate-800 bg-slate-950/40 p-1">
+                <button
+                  className={[
+                    "rounded-md px-2 py-1 text-xs font-medium",
+                    rightTab === "transaction"
+                      ? "bg-slate-800 text-slate-50"
+                      : "text-slate-300 hover:bg-slate-900/40",
+                  ].join(" ")}
+                  onClick={() => setRightTab("transaction")}
+                  type="button"
+                >
+                  Transaction
+                </button>
+                <button
+                  className={[
+                    "rounded-md px-2 py-1 text-xs font-medium",
+                    rightTab === "trace"
+                      ? "bg-slate-800 text-slate-50"
+                      : "text-slate-300 hover:bg-slate-900/40",
+                  ].join(" ")}
+                  onClick={() => setRightTab("trace")}
+                  type="button"
+                >
+                  Trace
+                </button>
+                <button
+                  className={[
+                    "rounded-md px-2 py-1 text-xs font-medium",
+                    rightTab === "sdk"
+                      ? "bg-slate-800 text-slate-50"
+                      : "text-slate-300 hover:bg-slate-900/40",
+                  ].join(" ")}
+                  onClick={() => setRightTab("sdk")}
+                  type="button"
+                >
+                  SDK
+                </button>
+              </div>
+            </div>
 
-          <Card title="SDK Examples">
-            <div className="space-y-4">
-              <ExampleBlock title="cURL" code={curlExample} />
-              <ExampleBlock title="TypeScript" code={tsExample} />
-              <ExampleBlock title="Go" code={goExample} />
+            <div className="mt-3 max-h-[calc(100vh-260px)] overflow-auto">
+              {rightTab === "transaction" ? (
+                <div>
+                  <div className="mb-2 text-xs font-medium uppercase tracking-wider text-slate-400">
+                    Transaction JSON
+                  </div>
+                  <div className="h-[420px] overflow-hidden rounded-lg border border-slate-800">
+                    <Editor
+                      height="420px"
+                      defaultLanguage="json"
+                      theme="vs-dark"
+                      value={txText}
+                      onChange={(v) => setTxText(v ?? "")}
+                      options={{
+                        minimap: { enabled: false },
+                        fontSize: 12,
+                        scrollBeyondLastLine: false,
+                      }}
+                    />
+                  </div>
+                </div>
+              ) : rightTab === "trace" ? (
+                <div>
+                  <div className="mb-2 text-xs font-medium uppercase tracking-wider text-slate-400">
+                    Execution Trace
+                  </div>
+                  {!result ? (
+                    <div className="text-sm text-slate-400">—</div>
+                  ) : result.trace.length === 0 ? (
+                    <div className="text-sm text-slate-400">
+                      No trace events.
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      {result.trace.map((t, idx) => (
+                        <div
+                          key={idx}
+                          className="flex items-start justify-between gap-3 rounded-md border border-slate-800 bg-slate-950/40 px-3 py-2"
+                        >
+                          <div className="min-w-0">
+                            <div className="text-sm text-slate-100">
+                              {t.type}
+                              {t.key ? `: ${t.key}` : ""}
+                            </div>
+                            <div className="mt-0.5 text-xs text-slate-400">
+                              {t.message}
+                            </div>
+                          </div>
+                          <div
+                            className={
+                              t.outcome === "PASS"
+                                ? "text-xs text-emerald-300"
+                                : "text-xs text-red-300"
+                            }
+                          >
+                            {t.outcome}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div>
+                  <div className="mb-2 text-xs font-medium uppercase tracking-wider text-slate-400">
+                    SDK Examples
+                  </div>
+                  <div className="space-y-4">
+                    <ExampleBlock title="cURL" code={curlExample} />
+                    <ExampleBlock title="TypeScript" code={tsExample} />
+                    <ExampleBlock title="Go" code={goExample} />
+                  </div>
+                </div>
+              )}
             </div>
           </Card>
         </div>

@@ -28,6 +28,8 @@ export default function AuditExplorerPage() {
   const [selected, setSelected] = useState<Evaluation | null>(null);
   const [selectedPolicy, setSelectedPolicy] = useState<null>(null);
 
+  const [tab, setTab] = useState<"details" | "compiled" | "replay">("details");
+
   useEffect(() => {
     let cancelled = false;
     async function load() {
@@ -125,7 +127,7 @@ export default function AuditExplorerPage() {
             ) : items.length === 0 ? (
               <div className="text-sm text-slate-400">No evaluations yet.</div>
             ) : (
-              <div className="overflow-auto">
+              <div className="max-h-[calc(100vh-260px)] overflow-auto">
                 <table className="w-full text-sm">
                   <thead className="text-left text-xs text-slate-400">
                     <tr>
@@ -208,50 +210,88 @@ export default function AuditExplorerPage() {
           </Card>
         </div>
 
-        <div className="space-y-4 lg:col-span-7">
-          <Card title="Details">
-            {!selected ? (
-              <div className="text-sm text-slate-400">
-                Select an evaluation.
+        <div className="lg:col-span-7">
+          <Card>
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <div className="text-sm font-semibold text-slate-100">
+                Evaluation
               </div>
-            ) : (
-              <div className="space-y-2">
-                <div className="text-sm text-slate-100">
-                  {selected.policyName}
-                </div>
-                <TooltipUI
-                  content="Unique ID of the evaluation record."
-                  side="top"
+              <div className="flex items-center gap-1 rounded-lg border border-slate-800 bg-slate-950/40 p-1">
+                <button
+                  className={[
+                    "rounded-md px-2 py-1 text-xs font-medium",
+                    tab === "details"
+                      ? "bg-slate-800 text-slate-50"
+                      : "text-slate-300 hover:bg-slate-900/40",
+                  ].join(" ")}
+                  onClick={() => setTab("details")}
+                  type="button"
                 >
-                  <div className="text-xs text-slate-500">
-                    Evaluation: {selected.id}
-                  </div>
-                </TooltipUI>
-                <TooltipUI
-                  content="Version number of the policy at the time of evaluation."
-                  side="top"
+                  Details
+                </button>
+                <button
+                  className={[
+                    "rounded-md px-2 py-1 text-xs font-medium",
+                    tab === "compiled"
+                      ? "bg-slate-800 text-slate-50"
+                      : "text-slate-300 hover:bg-slate-900/40",
+                  ].join(" ")}
+                  onClick={() => setTab("compiled")}
+                  type="button"
                 >
-                  <div className="text-xs text-slate-500">
-                    Policy version: v{selected.policyVersion}
-                  </div>
-                </TooltipUI>
-                <TooltipUI
-                  content="Human-readable explanation of the decision."
-                  side="top"
+                  Compiled
+                </button>
+                <button
+                  className={[
+                    "rounded-md px-2 py-1 text-xs font-medium",
+                    tab === "replay"
+                      ? "bg-slate-800 text-slate-50"
+                      : "text-slate-300 hover:bg-slate-900/40",
+                  ].join(" ")}
+                  onClick={() => setTab("replay")}
+                  type="button"
                 >
-                  <div className="text-xs text-slate-500">
-                    Reason: {selected.reason}
-                  </div>
-                </TooltipUI>
+                  Replay
+                </button>
               </div>
-            )}
-          </Card>
+            </div>
 
-          <Card title="Policy Diff (compiled)">
-            {!selected ? (
-              <div className="text-sm text-slate-400">—</div>
-            ) : (
-              <div>
+            <div className="mt-3 max-h-[calc(100vh-260px)] overflow-auto">
+              {!selected ? (
+                <div className="text-sm text-slate-400">
+                  Select an evaluation.
+                </div>
+              ) : tab === "details" ? (
+                <div className="space-y-2">
+                  <div className="text-sm text-slate-100">
+                    {selected.policyName}
+                  </div>
+                  <TooltipUI
+                    content="Unique ID of the evaluation record."
+                    side="top"
+                  >
+                    <div className="text-xs text-slate-500">
+                      Evaluation: {selected.id}
+                    </div>
+                  </TooltipUI>
+                  <TooltipUI
+                    content="Version number of the policy at the time of evaluation."
+                    side="top"
+                  >
+                    <div className="text-xs text-slate-500">
+                      Policy version: v{selected.policyVersion}
+                    </div>
+                  </TooltipUI>
+                  <TooltipUI
+                    content="Human-readable explanation of the decision."
+                    side="top"
+                  >
+                    <div className="text-xs text-slate-500">
+                      Reason: {selected.reason}
+                    </div>
+                  </TooltipUI>
+                </div>
+              ) : tab === "compiled" ? (
                 <div>
                   <div className="mb-2 text-xs font-medium uppercase tracking-wider text-slate-400">
                     <TooltipUI
@@ -265,36 +305,30 @@ export default function AuditExplorerPage() {
                     {JSON.stringify(snapshot?.compiled ?? null, null, 2)}
                   </pre>
                 </div>
-              </div>
-            )}
-          </Card>
-
-          <Card title="Trace Replay">
-            {!selected ? (
-              <div className="text-sm text-slate-400">—</div>
-            ) : !canReplay ? (
-              <div className="text-sm text-slate-400">
-                Missing `policySnapshot.graph` or `trace`.
-              </div>
-            ) : (
-              <div>
-                <div className="mb-2 text-xs text-slate-400">
-                  <TooltipUI
-                    content="Animates the policy graph while stepping through the evaluation trace events."
-                    side="top"
-                  >
-                    <span>
-                      Hover nodes to understand the path taken during
-                      evaluation.
-                    </span>
-                  </TooltipUI>
+              ) : !canReplay ? (
+                <div className="text-sm text-slate-400">
+                  Missing `policySnapshot.graph` or `trace`.
                 </div>
-                <TraceReplayFlow
-                  graph={snapshot!.graph!}
-                  trace={selected.trace}
-                />
-              </div>
-            )}
+              ) : (
+                <div>
+                  <div className="mb-2 text-xs text-slate-400">
+                    <TooltipUI
+                      content="Animates the policy graph while stepping through the evaluation trace events."
+                      side="top"
+                    >
+                      <span>
+                        Hover nodes to understand the path taken during
+                        evaluation.
+                      </span>
+                    </TooltipUI>
+                  </div>
+                  <TraceReplayFlow
+                    graph={snapshot!.graph!}
+                    trace={selected.trace}
+                  />
+                </div>
+              )}
+            </div>
           </Card>
         </div>
       </div>
